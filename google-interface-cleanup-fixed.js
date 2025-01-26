@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name         Google interface cleanup (Fixed Version)
-// @description  Remove junk from Google search results like "People also ask", etc. Fixed version of https://greasyfork.org/en/scripts/504171-google-interface-cleanup. All credit goes to the original author, antics1. Minor edits added for my personal preference.
+// @description  Remove junk from Google search results like "People also ask", etc. 
+//               Fixed version of https://greasyfork.org/en/scripts/504171-google-interface-cleanup. 
+//               All credit goes to the original author, antics1. Minor edits added for my personal preference.
 // @license      MIT
 // ==/UserScript==
 
