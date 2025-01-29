@@ -1,9 +1,13 @@
 // ==UserScript==
-// @name         Google interface cleanup (Fixed Version)
-// @description  Remove junk from Google search results like "People also ask", etc. 
-//               Fixed version of https://greasyfork.org/en/scripts/504171-google-interface-cleanup. 
-//               All credit goes to the original author, antics1. Minor edits added for my personal preference.
+// @name         Google interface cleanup fixed
+// @description  Remove junk from Google search results like "People also ask", etc.
 // @license      MIT
+// @version      130
+// @match        https://*.google.com/search*
+// @match        https://*.google.ca/search*
+// @match        https://*.google.fr/search*
+// @match        https://*.google.co.uk/search*
+// @run-at       document-end
 // ==/UserScript==
 
 const annoyances = [
@@ -54,10 +58,17 @@ function waitForKeyElements(
   interval = 300,
   maxIntervals = -1
 ) {
-  const targetNodes =
-    typeof selectorOrFunction === "function"
-      ? selectorOrFunction()
-      : document.querySelectorAll(selectorOrFunction);
+  let targetNodes;
+  try {
+    targetNodes =
+      typeof selectorOrFunction === "function"
+        ? selectorOrFunction()
+        : document.querySelectorAll(selectorOrFunction);
+  } catch (error) {
+    console.error(`Error querying selector: ${selectorOrFunction}`, error);
+    return;
+  }
+
   let targetsFound = targetNodes && targetNodes.length > 0;
 
   if (targetsFound) {
@@ -178,13 +189,11 @@ function visualDigest(jNode) {
 }
 
 function appendAsTopChild(targetNode) {
-  if (targetNode.textContent.trim() === "") {
-    return;
-  }
   const predefinedDiv = document.querySelector("#center_col");
   if (predefinedDiv) {
     predefinedDiv.insertBefore(targetNode, predefinedDiv.firstChild);
-    targetNode.style.paddingBottom = "20px";
+  } else {
+    console.error("#center_col element not found");
   }
 }
 
@@ -198,7 +207,7 @@ waitForKeyElements(
 );
 waitForKeyElements("inline-video", undesiredElement);
 waitForKeyElements("product-viewer-group", undesiredElement, false);
-waitForKeyElements("block-component", undesiredElement, false); // featured snippets at top
+waitForKeyElements("block-component", undesiredElement, false);
 waitForKeyElements(
   'form[action="/search"] > div > div[jscontroller]',
   removeSearchSuggestions
@@ -212,9 +221,10 @@ waitForKeyElements(
   visualDigest
 );
 waitForKeyElements('div[data-attrid="VisualDigestWebResult"]', visualDigest);
-
-// Append Blacklist to search top
-waitForKeyElements('div[id="tU52Vb"]', appendAsTopChild);
-
-// DISABLED
-// waitForKeyElements('#media_result_group', undesiredElement);
+waitForKeyElements(() => {
+  const elements = getbyXpath(
+    `//*[starts-with(text(), 'uBlacklist has blocked')]`
+  );
+  const targetElement = elements.find((el) => el.closest("#appbar"));
+  return targetElement ? [targetElement.closest("#appbar")] : null;
+}, appendAsTopChild);
