@@ -225,6 +225,7 @@ waitForKeyElements(() => {
   const elements = getbyXpath(
     `//*[starts-with(text(), 'uBlacklist has blocked')]`
   );
+  // Multiple banners can be present, but we only want the one under the id="appbar" div
   const targetElement = elements.find((el) => el.closest("#appbar"));
   return targetElement ? [targetElement.closest("#appbar")] : null;
 }, appendAsTopChild);
